@@ -1,4 +1,5 @@
 ﻿@page "/documentlist"
+@using System.Threading
 @inject IDocumentService documentService
  
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0
@@ -26,7 +27,7 @@
  
 <div>
    <a class="btn btn-primary"
-      href='/addPublisher'>Add new data</a>
+      href='/addDocument'>Add new data</a>
 </div>
 <br />
  
@@ -36,9 +37,17 @@
 }
 else
 {
+   <div class="row col-md-3">
+        <label for="search"><h8>Search by Status Code (-1: All Documents)</h8></label>
+    <input type="number" id="search" class="form-control" placeholder="Search by Document Status Code (-1: All Documents)" 
+    @bind-value="@SearchByStatusCode" @bind-value:event="oninput"
+    @onkeyup="SearchChanged"
+    />
+</div>
+
    <div class="row col-md-3 pull-right">
       <input type="text" id="txtSearch"
-         placeholder="Search Status Code..."
+         placeholder="Search By Document Name..."
          class="form-control" @bind="SearchTerm"
          @bind:event="oninput" />
    </div>
@@ -54,12 +63,12 @@ else
                <span class="fa @(SetSortIcon("Name"))"></span>
             </th>
             <th class="sort-th"
-               @onclick="@(() => SortTable("City"))">StatusCode
-               <span class="fa @(SetSortIcon("City"))"></span>
+               @onclick="@(() => SortTable("StatusCode"))">StatusCode
+               <span class="fa @(SetSortIcon("StatusCode"))"></span>
             </th>
             <th class="sort-th"
-               @onclick="@(() => SortTable("Country"))">Freeze
-               <span class="fa @(SetSortIcon("Country"))"></span>
+               @onclick="@(() => SortTable("Freeze"))">Freeze
+               <span class="fa @(SetSortIcon("Freeze"))"></span>
             </th>
             <th>Action</th>
          </tr>
@@ -121,7 +130,26 @@ else
       get { return searchTerm; }
       set { searchTerm = value; FilterRecords(); }
    }
- 
+     public int SearchByStatusCode{ get; set; } = -1;
+    private Timer _timer;
+
+    [Parameter]
+    public EventCallback<Task<List<Document>>> OnSearchChanged { get; set; }
+
+    private void SearchChanged()
+    {
+        if (_timer != null)
+        {
+            _timer.Dispose();
+        }
+        _timer = new Timer(OnTimerElapsed, null, 100, 0);
+    }
+
+    private void OnTimerElapsed(object sender)
+    {
+        OnSearchChanged.InvokeAsync(SearchByTerm(SearchByStatusCode));
+        _timer.Dispose();
+    }
    List<Document> documents;
    
    #region Pagination
@@ -272,6 +300,13 @@ else
       await refreshRecords(curPage);
    }
  
+    public async Task<List<Document>> SearchByTerm(int searchByStatusCode)
+    {
+        SearchByStatusCode = searchByStatusCode;
+        documents= await documentService.ListByStatusCode(SearchByStatusCode);
+
+        return documents.ToList();
+    }
    public void FilterRecords()
    {
       endPage = 0;

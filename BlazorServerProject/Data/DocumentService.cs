@@ -17,9 +17,9 @@ namespace BlazorServerProject.Data
         public Task<int> Create(Document document)
         {
             var dbPara = new DynamicParameters();
-            dbPara.Add("Name", document.Name, DbType.String);
-            dbPara.Add("StatuCode", document.StatusCode, DbType.Int32);
-            dbPara.Add("Freeze", document.Freeze, DbType.Int32);
+            dbPara.Add("name", document.Name, DbType.String);
+            dbPara.Add("statusCode", document.StatusCode, DbType.Int32);
+            dbPara.Add("freeze", document.Freeze, DbType.Int32);
             var documentId = Task.FromResult
                (_dapperService.Insert<int>("[dbo].[spAddDocument]",
                dbPara, commandType: CommandType.StoredProcedure));
@@ -57,15 +57,24 @@ namespace BlazorServerProject.Data
          return documents;
         }
 
+        public Task<List<Document>> ListByStatusCode( int search)
+        {
+            var documents = Task.FromResult
+               (_dapperService.GetAll<Document>
+               ($"SELECT * FROM [Documents] WHERE StatusCode ={search};", null, commandType: CommandType.Text));
+            return documents;
+        }
+
+
         public Task<int> Update(Document document)
         {
             var dbPara = new DynamicParameters();
             dbPara.Add("Id", document.Id);
-            dbPara.Add("Name", document.Name, DbType.String);
-            dbPara.Add("StatuCode", document.StatusCode, DbType.Int32);
-            dbPara.Add("Freeze", document.Freeze, DbType.Int32);
+            dbPara.Add("name", document.Name, DbType.String);
+            dbPara.Add("statusCode", document.StatusCode, DbType.Int32);
+            dbPara.Add("freeze", document.Freeze, DbType.Int32);
             var updateDocument = Task.FromResult
-               (_dapperService.Update<int>("[dbo].[spUpdateDocument]",
+               (_dapperService.Update<int>("[dbo].[spUpdateDocs]",
                dbPara, commandType: CommandType.StoredProcedure));
             return updateDocument;
         }

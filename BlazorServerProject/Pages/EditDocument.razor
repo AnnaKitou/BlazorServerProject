@@ -1,4 +1,4 @@
-﻿@page "/editPublisher/{id:int}"
+﻿@page "/editDocument/{id:int}"
 @inject IDocumentService documentService
 @inject Microsoft.AspNetCore.Components.NavigationManager navigationManager
 <h2>
@@ -14,8 +14,7 @@
             <label for="StatusCode" class="control-label">StatusCode</label>
             <input for="StatusCode" class="form-control"
                @bind-value="@document.StatusCode" />
-            <label for="Freeze" class="control-label">
-               Freeze</label>
+            <label for="Freeze" class="control-label">Freeze</label>
             <input for="Freeze" class="form-control"
                @bind-value="@document.Freeze" />           
          </div>

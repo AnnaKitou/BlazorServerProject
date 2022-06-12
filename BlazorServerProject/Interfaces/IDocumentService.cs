@@ -13,5 +13,7 @@ namespace BlazorServerProject.Interfaces
         Task<Document> GetById(int Id);
         Task<List<Document>> ListAll(int skip, int take,
             string orderBy, string direction, string search);
+
+        Task<List<Document>> ListByStatusCode( int searchByStatusCode);
     }
 }
