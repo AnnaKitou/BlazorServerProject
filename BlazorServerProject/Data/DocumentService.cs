@@ -1,6 +1,7 @@
 ﻿using BlazorServerProject.Entities;
 using BlazorServerProject.Interfaces;
 using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -44,20 +45,45 @@ namespace BlazorServerProject.Data
         public Task<int> Count(string search)
         {
             var totDocument = Task.FromResult(_dapperService.Get<int>
-               ($"select COUNT(*) from [Documents] WHERE Name like '%{search}%'", null,
-                  commandType: CommandType.Text));
+                                 ($"SELECT * FROM [Documents]; ", null, commandType: CommandType.Text));
+
+            if (search == "-1" || search == null)
+            {
+                totDocument = totDocument;
+            }
+            else
+            {
+                int c = Convert.ToInt32(search);
+                totDocument = Task.FromResult(_dapperService.Get<int>
+                  ($"select COUNT(*) from [Documents] WHERE StatusCode={c};", null,
+                     commandType: CommandType.Text));
+            }
             return totDocument;
         }
         public Task<List<Document>> ListAll(int skip, int take,
          string orderBy, string direction = "DESC", string search = "")
         {
+
             var documents = Task.FromResult
-               (_dapperService.GetAll<Document>
-               ($"SELECT * FROM [Documents] WHERE Name like '%{search}%' ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
-         return documents;
+                 (_dapperService.GetAll<Document>
+                 ($"SELECT * FROM [Documents] ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
+
+            if (search == "-1" || search == null)
+            {
+                documents = documents;
+            }
+            else
+            {
+                int c = Convert.ToInt32(search);
+                documents = Task.FromResult
+                  (_dapperService.GetAll<Document>
+                  ($"SELECT * FROM [Documents] WHERE StatusCode={c} ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
+
+            }
+            return documents;
         }
 
-        public Task<List<Document>> ListByStatusCode( int search)
+        public Task<List<Document>> ListByStatusCode(int search)
         {
             var documents = Task.FromResult
                (_dapperService.GetAll<Document>
