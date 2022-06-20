@@ -39,37 +39,37 @@ else
 {
 
     <section>
-    <select class="form-contol" @bind="SearchTerm"
-           @bind:event="onchange"> 
-        <option value="-1" selected>-All Documents-</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="30">30</option>
-        <option value="40">40</option>
-        <option value="50">50</option>
-        <option value="60">60</option>
-        <option value="70">70</option>
-        <option value="80">80</option>
-        <option value="90">90</option>
-        <option value="100">100</option>
-       
-    </select>
-</section>
+        <select class="form-contol" @bind="SearchTerm"
+            @bind:event="onchange">
+            <option value="-1" selected>---All Documents---</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="50">50</option>
+            <option value="60">60</option>
+            <option value="70">70</option>
+            <option value="80">80</option>
+            <option value="90">90</option>
+            <option value="100">100</option>
+
+        </select>
+    </section>
 
 
- @*   <div class="row col-md-3">
+    @*   <div class="row col-md-3">
         <label for="search"><h8>Search by Status Code (-1: All Documents)</h8></label>
         <input type="number" id="search" class="form-control" placeholder="Search by Document Status Code (-1: All Documents)"
-           @bind-value="@SearchByStatusCode" @bind-value:event="oninput"
-           @onkeyup="SearchChanged" />
-    </div>*@
-@*
-    <div class="row col-md-3 pull-right">
+        @bind-value="@SearchByStatusCode" @bind-value:event="oninput"
+        @onkeyup="SearchChanged" />
+        </div>*@
+    @*
+        <div class="row col-md-3 pull-right">
         <input type="text" id="txtSearch"
-           placeholder="Search By Document Name..."
-           class="form-control" @bind="SearchTerm"
-           @bind:event="oninput" />
-    </div>*@
+        placeholder="Search By Document Name..."
+        class="form-control" @bind="SearchTerm"
+        @bind:event="oninput" />
+        </div>*@
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -149,11 +149,11 @@ else
 
 
 @code {
-    private string searchTerm;
+    private string searchTerm = "-1";
     private string SearchTerm
     {
         get { return searchTerm; }
-        set { searchTerm =value; FilterRecords(); }
+        set { searchTerm = value; FilterRecords(); }
     }
     public int SearchByStatusCode { get; set; } = -1;
     private Timer _timer;
