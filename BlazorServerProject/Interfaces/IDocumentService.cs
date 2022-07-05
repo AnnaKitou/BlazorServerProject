@@ -8,12 +8,11 @@ namespace BlazorServerProject.Interfaces
     {
         Task<int> Create(Document document);
         Task<int> Delete(int Id);
-        Task<int> Count(string search);
+        Task<int> Count(string search,string searchWord);
         Task<int> Update(Document document);
         Task<Document> GetById(int Id);
         Task<List<Document>> ListAll(int skip, int take,
-            string orderBy, string direction, string search);
+            string orderBy, string direction, string search, string searchWord);
 
-        Task<List<Document>> ListByStatusCode( int searchByStatusCode);
     }
 }

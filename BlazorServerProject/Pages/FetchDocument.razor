@@ -37,6 +37,13 @@
 }
 else
 {
+        <div class="row col-md-3 pull-right">
+        <input type="text" id="txtSearch"
+        placeholder="Search By Document Name..."
+        class="form-control" @bind="searchWord"
+        @bind:event="oninput" />
+        </div>
+
 
     <section>
         <select class="form-contol" @bind="SearchTerm"
@@ -63,13 +70,8 @@ else
         @bind-value="@SearchByStatusCode" @bind-value:event="oninput"
         @onkeyup="SearchChanged" />
         </div>*@
-    @*
-        <div class="row col-md-3 pull-right">
-        <input type="text" id="txtSearch"
-        placeholder="Search By Document Name..."
-        class="form-control" @bind="SearchTerm"
-        @bind:event="oninput" />
-        </div>*@
+   
+
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -150,31 +152,38 @@ else
 
 @code {
     private string searchTerm = "-1";
+    private string searchWord;
+
     private string SearchTerm
     {
         get { return searchTerm; }
         set { searchTerm = value; FilterRecords(); }
     }
-    public int SearchByStatusCode { get; set; } = -1;
-    private Timer _timer;
-
-    [Parameter]
-    public EventCallback<Task<List<Document>>> OnSearchChanged { get; set; }
-
-    private void SearchChanged()
+     private string SearchWord
     {
-        if (_timer != null)
-        {
-            _timer.Dispose();
-        }
-        _timer = new Timer(OnTimerElapsed, null, 100, 0);
+        get { return searchWord; }
+        set { searchWord = value; FilterRecords(); }
     }
+    //public int SearchByStatusCode { get; set; } = -1;
+    //private Timer _timer;
 
-    private void OnTimerElapsed(object sender)
-    {
-        OnSearchChanged.InvokeAsync(SearchByTerm(SearchByStatusCode));
-        _timer.Dispose();
-    }
+    //[Parameter]
+    //public EventCallback<Task<List<Document>>> OnSearchChanged { get; set; }
+
+    //private void SearchChanged()
+    //{
+    //    if (_timer != null)
+    //    {
+    //        _timer.Dispose();
+    //    }
+    //    _timer = new Timer(OnTimerElapsed, null, 100, 0);
+    //}
+
+    //private void OnTimerElapsed(object sender)
+    //{
+    //    OnSearchChanged.InvokeAsync(SearchByTerm(SearchByStatusCode));
+    //    _timer.Dispose();
+    //}
     List<Document> documents;
 
     #region Pagination
@@ -198,8 +207,8 @@ else
         pageSize = 5;
         curPage = 1;
         documents = await documentService.ListAll((curPage - 1)
-        * pageSize, pageSize, sortColumnName, sortDir, searchTerm);
-        totalRecords = await documentService.Count(searchTerm);
+        * pageSize, pageSize, sortColumnName, sortDir, searchTerm,searchWord);
+        totalRecords = await documentService.Count(searchTerm,searchWord);
         totalPages = (int)Math.Ceiling(totalRecords / (decimal)pageSize);
         SetPagerSize("forward");
     }
@@ -208,7 +217,7 @@ else
     {
         await documentService.Delete(id);
         documents = await documentService.ListAll((curPage - 1)
-         * pageSize, pageSize, sortColumnName, sortDir, searchTerm);
+         * pageSize, pageSize, sortColumnName, sortDir, searchTerm,searchWord);
     }
 
     private bool isSortedAscending;
@@ -218,7 +227,7 @@ else
             SortRecords(string columnName, string dir)
     {
         return await documentService.ListAll((curPage - 1) *
-        pageSize, pageSize, columnName, dir, searchTerm);
+        pageSize, pageSize, columnName, dir, searchTerm,searchWord);
     }
 
     private async Task SortTable(string columnName)
@@ -266,7 +275,7 @@ else
     {
         documents = await documentService.ListAll
            ((currentPage - 1) * pageSize, pageSize, sortColumnName,
-           sortDir, searchTerm);
+           sortDir, searchTerm,searchWord);
         curPage = currentPage;
         this.StateHasChanged();
     }
@@ -325,13 +334,7 @@ else
         await refreshRecords(curPage);
     }
 
-    public async Task<List<Document>> SearchByTerm(int searchByStatusCode)
-    {
-        SearchByStatusCode = searchByStatusCode;
-        documents = await documentService.ListByStatusCode(SearchByStatusCode);
-
-        return documents.ToList();
-    }
+   
     public void FilterRecords()
     {
         endPage = 0;

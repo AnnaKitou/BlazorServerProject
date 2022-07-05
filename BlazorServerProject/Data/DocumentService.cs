@@ -42,27 +42,27 @@ namespace BlazorServerProject.Data
                commandType: CommandType.Text));
             return deleteDocument;
         }
-        public Task<int> Count(string search)
+        public Task<int> Count(string search, string searchWord)
         {
           
             int c = Convert.ToInt32(search);
             if (c==-1)
             {
                var totDocument = Task.FromResult(_dapperService.Get<int>
-                               ($"SELECT COUNT(*) FROM [Documents]; ", null, commandType: CommandType.Text));
+                               ($"SELECT COUNT(*) FROM [Documents] WHERE Name like '%{searchWord}%'; ", null, commandType: CommandType.Text));
                 return totDocument;
             }
             else
             {
                 
                var totDocument = Task.FromResult(_dapperService.Get<int>
-                      ($"select COUNT(*) from [Documents] WHERE StatusCode={c};", null,
+                      ($"select COUNT(*) from [Documents] WHERE Name like '%{searchWord}%' ; ", null,
                          commandType: CommandType.Text));
                 return totDocument;
             }
         }
         public Task<List<Document>> ListAll(int skip, int take,
-         string orderBy, string direction = "DESC", string search ="-1")
+         string orderBy, string direction = "DESC", string search ="-1",string searchWord="")
         {
 
             int c = Convert.ToInt32(search);
@@ -71,7 +71,7 @@ namespace BlazorServerProject.Data
             {
                 var documents = Task.FromResult
                                (_dapperService.GetAll<Document>
-                               ($"SELECT * FROM [Documents] ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
+                               ($"SELECT * FROM [Documents] WHERE Name like '%{searchWord}%' ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
                 return documents;
             }
             else
@@ -79,19 +79,10 @@ namespace BlazorServerProject.Data
 
                 var documents = Task.FromResult
                     (_dapperService.GetAll<Document>
-                    ($"SELECT * FROM [Documents] WHERE StatusCode={c} ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
+                    ($"SELECT * FROM [Documents] WHERE Name like '%{searchWord}%' AND StatusCode={c} ORDER BY {orderBy} { direction} OFFSET { skip}  ROWS FETCH NEXT { take} ROWS ONLY; ", null, commandType: CommandType.Text));
                 return documents;
             }
         }
-
-        public Task<List<Document>> ListByStatusCode( int search)
-        {
-            var documents = Task.FromResult
-               (_dapperService.GetAll<Document>
-               ($"SELECT * FROM [Documents] WHERE StatusCode ={search};", null, commandType: CommandType.Text));
-            return documents;
-        }
-
 
         public Task<int> Update(Document document)
         {
